@@ -27,19 +27,6 @@ app.use("/api/v1/company",companyRoute);
 app.use("/api/v1/job",jobRoute);
 app.use("/api/v1/application",applicationRoute);
 // Base URL: http://localhost:5001//api/v1/user/
-// {
-//  "fullname":"Sidhe",
-//  "email":"sidhfr@gmail.com",
-//  "phoneNumber":3218392132,
-//  "password":"gamepro123",
-//  "role":"recruiter"
-// }
-// app.get('/home',(req,res)=>{
-//     return res.status(200).json({
-//         message:"I am coming from Backend",
-//         success:true
-//     })
-// });
 
 app.listen(PORT,()=>{console.log(`Server is running at Port no: ${PORT}`);ConnectToDb();});
 
