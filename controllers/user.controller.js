@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 import bcrypt from 'bcryptjs'
+import cloudinary from "../utils/cloudinary.js";
+import getDataUri from "../utils/datauri.js";
 
 export const register = async(req,res) =>{
     try{
@@ -105,13 +107,18 @@ export const updateProfile = async(req,res)=>{
     console.log("Updating Profile.")
     try{
         let {fullname,email,phoneNumber,bio,skills} = req.body;
-        console.log("Updating Profile.1")
-        if(!fullname || !email || !phoneNumber || !bio || !skills){
-            return(res.status(400).json({
-                message:"Some Data is missing.",
-                success:false
-            }))
-        }
+
+        const file = req.file;
+        // console.log(file);
+        const fileUri = getDataUri(file);
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+        // console.log(cloudResponse);
+            if(!fullname || !email || !phoneNumber || !bio || !skills){
+                return(res.status(400).json({
+                    message:"Some Data is missing.",
+                    success:false
+                }))
+            }
         const userId = req.id; //Middleware authentication.
         let user = await User.findById(userId);
         // console.log(user);
@@ -132,7 +139,10 @@ export const updateProfile = async(req,res)=>{
         if(phoneNumber)  user.phoneNumber = phoneNumber
         if(bio) user.profile.bio = bio
         if(skills) user.profile.skills = skillsArray
-
+        if(cloudResponse){
+            user.profile.resume = cloudResponse.secure_url // save the cloudinary url
+            user.profile.resumeOriginalName = file.originalname // Save the original file name
+        }
         let saveStatus=await user.save();
         if(saveStatus){
             return res.status(200).json({
@@ -162,6 +172,7 @@ export const updateProfile = async(req,res)=>{
         // })
 
     }catch(error){
+        console.log(error.message);
         return res.status(400).json({
             message:"Profile Update Failed",
             success:false

@@ -91,8 +91,16 @@ export const getAllJobs = async(req,res)=>{
 
 export const getJobById = async(req,res)=>{
     try{
+        // console.log(req.params.id);
+        // if (!req.id) {
+        //     return res.status(401).json({
+        //         message: "Unauthorized. Please sign in.",
+        //         success: false
+        //     });
+        // }
         const jobId = req.params.id;
         const job =  await Job.findById(jobId);
+        // console.log(job);
         if(!job){
             return res.status(400).json({
                 message:"Jobs not found.",
